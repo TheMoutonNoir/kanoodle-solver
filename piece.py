@@ -2,23 +2,30 @@ import numpy as np
 
 
 class Piece:
-    def __init__(self,position_x,position_y,shape):
-        self.position_x = position_x
-        self.position_y = position_y
-        self.beenTransposed = False
-        self.beenFlipped = False
+    def __init__(self, shape, transposed=False, hflipped=False, vflipped=False):
+        self.transposed = transposed
+        self.hflipped = hflipped
+        self.vflipped = vflipped
         self.shape = shape
-    
+        if transposed:
+            self.transposePiece()
+        if hflipped:
+            self.hflipPiece()
+        if vflipped:
+            self.vflipPiece()
+
     def transposePiece(self):
         self.shape.value.space = np.transpose(self.shape.value.space)
-        self.beenTransposed = not self.beenTransposed
+        self.transposed = not self.transposed
 
-    def flipPiece(self):
+    def hflipPiece(self):
         self.shape.value.space = np.flip(self.shape.value.space)
-        self.beenFlipped = not self.beenFlipped
+        self.hflipped = not self.hflipped
 
+    def vflipPiece(self):
+        self.shape.value.space = np.flip(self.shape.value.space, axis=1)
+        self.vflipped = not self.vflipped
 
     def printShape(self):
         for row in self.shape.value.space:
             print(row)
-    
