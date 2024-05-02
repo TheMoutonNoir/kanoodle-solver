@@ -13,8 +13,8 @@ class Board:
         print()
 
     def place_piece(self, piece, y, x):
-        piece_shape = piece.shape.value.space
-        piece_name = piece.shape.value.name
+        piece_shape = piece.shape.space
+        piece_name = piece.shape.name
 
         end_y, end_x = y + piece_shape.shape[0], x + piece_shape.shape[1]
         if end_y > self.size_y or end_x > self.size_x:
@@ -28,7 +28,7 @@ class Board:
         return True
 
     def remove_piece(self, piece, y, x):
-        piece_shape = piece.shape.value.space
+        piece_shape = piece.shape.space
         for dy in range(piece_shape.shape[0]):
             for dx in range(piece_shape.shape[1]):
                 if piece_shape[dy, dx] == 1:
@@ -38,7 +38,7 @@ class Board:
 
     def find_possible_placements(self, piece):
         possible_places = []
-        piece_shape = piece.shape.value.space
+        piece_shape = piece.shape.space
         for y in range(self.size_y):
             for x in range(self.size_x):
                 if (
@@ -50,7 +50,7 @@ class Board:
         return possible_places
 
     def can_place(self, piece, y, x):
-        piece_shape = piece.shape.value.space
+        piece_shape = piece.shape.space
         target_area = self.board[
             y : y + piece_shape.shape[0], x : x + piece_shape.shape[1]
         ]

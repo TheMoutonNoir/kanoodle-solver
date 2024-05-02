@@ -8,6 +8,15 @@ class ShapeData:
         self.weight = weight
         self.name = name
 
+    def transpose(self):
+        return ShapeData(np.transpose(self.space), self.weight, self.name)
+
+    def hflip(self):
+        return ShapeData(np.flip(self.space, axis=1), self.weight, self.name)
+
+    def vflip(self):
+        return ShapeData(np.flip(self.space, axis=0), self.weight, self.name)
+
 
 class Noodle(Enum):
     A = ShapeData(np.array([[0, 1], [0, 1], [1, 1]]), 4, "A")

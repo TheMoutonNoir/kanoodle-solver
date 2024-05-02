@@ -1,42 +1,58 @@
 import numpy as np
 from noodle import Noodle
+from board import Board
 
 
 class Piece:
     def __init__(
         self, shape, is_transposed=False, is_hflipped=False, is_vflipped=False
     ):
-        self.shape = shape
+        self.original_shape = shape
         self.is_transposed = is_transposed
         self.is_hflipped = is_hflipped
         self.is_vflipped = is_vflipped
-        self._apply_transformations()
+        self.shape = self.apply_transformations(shape)
 
-    def _apply_transformations(self):
+    def apply_transformations(self, shape):
         if self.is_transposed:
-            self.shape.value.space = np.transpose(self.shape.value.space)
+            shape = shape.transpose()
         if self.is_hflipped:
-            self.shape.value.space = np.flip(self.shape.value.space, axis=1)
+            shape = shape.hflip()
         if self.is_vflipped:
-            self.shape.value.space = np.flip(self.shape.value.space, axis=0)
+            shape = shape.vflip()
+        return shape
 
     def __str__(self):
-        return np.array_str(self.shape.value.space)
+        return np.array_str(self.shape.space)
 
     def get_transposed(self):
         return Piece(
-            self.shape, not self.is_transposed, self.is_hflipped, self.is_vflipped
+            self.original_shape,
+            not self.is_transposed,
+            self.is_hflipped,
+            self.is_vflipped,
         )
 
     def get_hflipped(self):
         return Piece(
-            self.shape, self.is_transposed, not self.is_hflipped, self.is_vflipped
+            self.original_shape,
+            self.is_transposed,
+            not self.is_hflipped,
+            self.is_vflipped,
         )
 
     def get_vflipped(self):
         return Piece(
-            self.shape, self.is_transposed, self.is_hflipped, not self.is_vflipped
+            self.original_shape,
+            self.is_transposed,
+            self.is_hflipped,
+            not self.is_vflipped,
         )
+
+    def draw_piece(self):
+        b = Board(20, 20)
+        b.place_piece(self, 5, 5)
+        b.print_board()
 
     def unique_transformations(self):
         transformations = set()
@@ -45,8 +61,16 @@ class Piece:
         for is_transposed in [True, False]:
             for is_hflipped in [True, False]:
                 for is_vflipped in [True, False]:
-                    transformed_piece = Piece(
-                        self.shape, is_transposed, is_hflipped, is_vflipped
+                    transformed_piece = self.get_transposed() if is_transposed else self
+                    transformed_piece = (
+                        transformed_piece.get_hflipped()
+                        if is_hflipped
+                        else transformed_piece
+                    )
+                    transformed_piece = (
+                        transformed_piece.get_vflipped()
+                        if is_vflipped
+                        else transformed_piece
                     )
                     piece_str = str(transformed_piece)
                     if piece_str not in transformations:
