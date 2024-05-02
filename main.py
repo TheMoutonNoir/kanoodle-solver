@@ -7,9 +7,9 @@ from solve import solve
 def main():
     b = Board(11, 5)
     p1 = Piece(Noodle.K)
-    p2 = Piece(Noodle.E, transposed=True, vflipped=True)
-    b.placePiece(p1, 1, 1)
-    b.placePiece(p2, 3, 3)
+    p2 = Piece(Noodle.E, is_transposed=True, is_vflipped=True)
+    b.place_piece(p1, 1, 1)
+    b.place_piece(p2, 3, 3)
 
     p3 = Piece(Noodle.A)
     p4 = Piece(Noodle.B)
@@ -22,12 +22,12 @@ def main():
     p11 = Piece(Noodle.J)
     p12 = Piece(Noodle.L)
 
-    pieces = [p3, p4, p5, p6, p7, p8, p9, p10, p11, p12]
+    pieces = [p3, p4, p5, p6, p7, p8]
 
-    # solve the puzzle
     solution = solve(b, pieces)
+
     if solution:
-        solution.printBoard()
+        solution.print_board()
     else:
         print("No solution found")
 
