@@ -7,7 +7,6 @@ class Board:
         self.size_x = size_x
         self.size_y = size_y
         self.pieces = []
-        self.piece_weights = 0
 
     def print_board(self):
         for row in self.board:
@@ -28,7 +27,6 @@ class Board:
 
         self.board[y:end_y, x:end_x][piece_shape == 1] = piece_name
         self.pieces.append((piece, x, y))
-        self.piece_weights += piece.shape.weight
         return True
 
     def remove_piece(self, piece, x, y):
@@ -67,6 +65,4 @@ class Board:
         new_board.board = self.board.copy()
         # Copy the list of placed pieces
         new_board.pieces = self.pieces.copy()
-        # Copy the total weight of placed pieces
-        new_board.piece_weights = self.piece_weights
         return new_board
