@@ -9,22 +9,25 @@ def create_algorithm_x_matrix(board, pieces):
 
     print("Creating constraint matrix...")
     for piece in pieces:
-        placements = board.find_possible_placements(piece)
-        print(
-            f"Found {len(placements)} possible placements for piece {piece.shape.name}"
-        )
-        print(placements)
-        print(piece.shape.space)
-        for x, y in placements:
-            columns = [
-                y * board.size_x + x + dy * board.size_x + dx
-                for dy in range(piece.shape.space.shape[0])
-                for dx in range(piece.shape.space.shape[1])
-                if piece.shape.space[dy, dx] == 1
-            ]
-            columns.append(board_size + piece_id)
-            print(f"Appending row for piece {piece.shape.name} at ({x},{y}): {columns}")
-            solver.appendRow(columns, (piece.shape.name, piece, x, y))
+        for transformation in piece.unique_transformations():
+            placements = board.find_possible_placements(transformation)
+            # print(
+            #     f"Found {len(placements)} possible placements for piece {piece.shape.name} with transformations: is_transposed {transformation.is_transposed}, is_hflipped {transformation.is_hflipped}, is_vflipped {transformation.is_vflipped}"
+            # )
+            for x, y in placements:
+                columns = [
+                    y * board.size_x + x + dy * board.size_x + dx
+                    for dy in range(transformation.shape.space.shape[0])
+                    for dx in range(transformation.shape.space.shape[1])
+                    if transformation.shape.space[dy, dx] == 1
+                ]
+                columns.append(board_size + piece_id)
+                # print(
+                #     f"Appending row for piece {transformation.shape.name} at ({x},{y}): {columns}"
+                # )
+                solver.appendRow(
+                    columns, (transformation.shape.name, transformation, x, y)
+                )
         piece_id += 1
 
     return solver
@@ -35,14 +38,16 @@ def apply_solution(board, solution):
     for s in solution:
         piece_name, transformation, x, y = s
         print(f"Placing piece {piece_name} at ({x},{y})")
-        board.place_piece(transformation, y, x)
+        board.place_piece(transformation, x, y)
+    board.print_board()
 
 
 def solve(board, pieces):
     solver = create_algorithm_x_matrix(board, pieces)
     for solution in solver.solve():
         print("Solution found!")
-        print(solution)
+        board_copy = board.copy_board()
+        apply_solution(board_copy, solution)
 
 
 # Assume the board and pieces are already defined elsewhere
