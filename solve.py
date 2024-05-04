@@ -1,133 +1,55 @@
-class DLXNode:
-    def __init__(self, row, col):
-        self.left = self
-        self.right = self
-        self.up = self
-        self.down = self
-        self.row = row
-        self.col = col
+from algorithm_x import AlgorithmX
 
 
-class HeaderNode(DLXNode):
-    def __init__(self, col):
-        super().__init__(None, col)
-        self.size = 0  # Number of nodes in this column
+def create_algorithm_x_matrix(board, pieces):
+    board_size = board.size_x * board.size_y
+    num_columns = board_size + len(pieces)
+    solver = AlgorithmX(num_columns)
+    piece_id = 0
+
+    print("Creating constraint matrix...")
+    for piece in pieces:
+        placements = board.find_possible_placements(piece)
+        print(
+            f"Found {len(placements)} possible placements for piece {piece.shape.name}"
+        )
+        print(placements)
+        print(piece.shape.space)
+        for x, y in placements:
+            columns = [
+                y * board.size_x + x + dy * board.size_x + dx
+                for dy in range(piece.shape.space.shape[0])
+                for dx in range(piece.shape.space.shape[1])
+                if piece.shape.space[dy, dx] == 1
+            ]
+            columns.append(board_size + piece_id)
+            print(f"Appending row for piece {piece.shape.name} at ({x},{y}): {columns}")
+            solver.appendRow(columns, (piece.shape.name, piece, x, y))
+        piece_id += 1
+
+    return solver
 
 
-def add_node(above, left, row, col):
-    new_node = DLXNode(row, col)
-    # Link horizontally
-    new_node.left = left
-    new_node.right = left.right
-    left.right.left = new_node
-    left.right = new_node
-    # Link vertically
-    new_node.up = above
-    new_node.down = above.down
-    above.down.up = new_node
-    above.down = new_node
-    col.size += 1
-    return new_node
+def apply_solution(board, solution):
+    print("Applying solution...")
+    for s in solution:
+        piece_name, transformation, x, y = s
+        print(f"Placing piece {piece_name} at ({x},{y})")
+        board.place_piece(transformation, y, x)
 
 
-def make_dancing_links_matrix(board, pieces):
-    num_cells = board.size_x * board.size_y
-    num_constraints = num_cells + len(pieces)
-    header = HeaderNode("header")
-    column_nodes = [HeaderNode(c) for c in range(num_constraints)]
-
-    # Link headers
-    prev = header
-    for node in column_nodes:
-        node.right = prev.right
-        node.left = prev
-        prev.right.left = node
-        prev.right = node
-        prev = node
-
-    # Create rows for each piece placement
-    for i, piece in enumerate(pieces):
-        for placement in board.find_possible_placements(piece):
-            leftmost = None
-            row_start = None
-            for pos in placement.positions:
-                col = column_nodes[pos]
-                above = col.up
-                if not leftmost:
-                    leftmost = add_node(above, col, placement, col)
-                    row_start = leftmost
-                else:
-                    add_node(above, leftmost, placement, col)
-            # Piece-used constraint
-            piece_col = column_nodes[num_cells + i]
-            add_node(piece_col.up, row_start, placement, piece_col)
-
-    return header
-
-
-def cover(col):
-    col.left.right = col.right
-    col.right.left = col.left
-    row = col.down
-    while row != col:
-        node = row.right
-        while node != row:
-            node.down.up = node.up
-            node.up.down = node.down
-            node.col.size -= 1
-            node = node.right
-        row = row.down
-
-
-def uncover(col):
-    row = col.up
-    while row != col:
-        node = row.left
-        while node != row:
-            node.col.size += 1
-            node.down.up = node
-            node.up.down = node
-            node = node.left
-        row = row.up
-    col.left.right = col
-    col.right.left = col
-
-
-def solve_dlx(header):
-    if header.right == header:
-        return []  # Solution found
-
-    c = header.right
-    while c != header and c.size == 0:
-        c = c.right
-    if c == header:
-        return None  # No solution
-
-    cover(c)
-    r = c.down
-    while r != c:
-        solution = [r.row]
-        node = r.right
-        while node != r:
-            cover(node.col)
-            node = node.right
-
-        result = solve_dlx(header)
-        if result:
-            return solution + result
-
-        node = r.left
-        while node != r:
-            uncover(node.col)
-            node = node.left
-
-        r = r.down
-    uncover(c)
-    return None
-
-
-# Example usage
 def solve(board, pieces):
-    header = make_dancing_links_matrix(board, pieces)
-    solution = solve_dlx(header)
-    return solution
+    solver = create_algorithm_x_matrix(board, pieces)
+    for solution in solver.solve():
+        print("Solution found!")
+        print(solution)
+
+
+# Assume the board and pieces are already defined elsewhere
+# board = Board(size_x, size_y)
+# pieces = [Piece(shape1), Piece(shape2), ...]
+# solution_board = solve(board, pieces)
+# if solution_board:
+#     solution_board.print_board()
+# else:
+#     print("No solution found.")
