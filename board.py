@@ -29,14 +29,14 @@ class Board:
         self.pieces.append((piece, x, y))
         return True
 
-    def remove_piece(self, piece, x, y):
-        piece_shape = piece.shape.space
-        for dy in range(piece_shape.shape[0]):
-            for dx in range(piece_shape.shape[1]):
-                if piece_shape[dy, dx] == 1:
-                    self.board[y + dy, x + dx] = "."
+    # def remove_piece(self, piece, x, y):
+    #     piece_shape = piece.shape.space
+    #     for dy in range(piece_shape.shape[0]):
+    #         for dx in range(piece_shape.shape[1]):
+    #             if piece_shape[dy, dx] == 1:
+    #                 self.board[y + dy, x + dx] = "."
 
-        return True
+    #     return True
 
     def find_possible_placements(self, piece):
         possible_places = []

@@ -39,8 +39,9 @@ def demo():
 
 def main():
     b = Board(11, 5)
+    b2 = Board(11, 5)
     p1 = Piece(Noodle.K.value)
-    p2 = Piece(Noodle.E.value)
+    p2 = Piece(Noodle.E.value, is_transposed=True, is_hflipped=True)
     p3 = Piece(Noodle.A.value)
     p4 = Piece(Noodle.B.value)
     p5 = Piece(Noodle.C.value)
@@ -52,9 +53,17 @@ def main():
     p11 = Piece(Noodle.J.value)
     p12 = Piece(Noodle.L.value)
 
-    pieces = [p1, p2, p3, p4, p5, p6, p8, p9, p10, p11, p12]
+    pieces = [p3, p4, p5, p6, p7,p8, p9, p10, p11, p12]
 
-    b.place_piece(p7, 0, 0)
+    placement = b2.place_piece(p3,9,0)
+    print(placement)
+    b2.print_board()
+
+    result = b.find_possible_placements(p5)
+    print(result)
+
+    b.place_piece(p1, 2, 1)
+    b.place_piece(p2, 4, 3)
 
     print("Initial board:")
     b.print_board()
